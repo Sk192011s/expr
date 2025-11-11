@@ -5,72 +5,216 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>EXP Generator</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0d1117;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
+    :root{
+      --bg:#0d1117;
+      --panel:#0f1720;
+      --muted:#9aa4b2;
+      --accent:#58a6ff;
+      --green:#2ea043;
+      --glass: rgba(255,255,255,0.03);
     }
-    h1 { color: #58a6ff; margin-bottom: 20px; }
-    .container {
-      background: #161b22;
-      padding: 25px;
-      border-radius: 10px;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    html,body{height:100%;margin:0;font-family:Inter, "Segoe UI", Roboto, Arial;}
+    body{
+      background: linear-gradient(180deg,#071027 0%, #0d1117 100%);
+      color:#e6eef8;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
     }
-    input, button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      border-radius: 8px;
-      border: none;
-      font-size: 16px;
+
+    .card{
+      width:100%;
+      max-width:520px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.04);
+      border-radius:14px;
+      padding:22px;
+      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+      backdrop-filter: blur(6px);
     }
-    input {
-      background: #0d1117;
-      color: #fff;
-      border: 1px solid #30363d;
+
+    h1{margin:0 0 8px 0;color:var(--accent);font-size:20px;}
+    p.lead{margin:0 0 16px 0;color:var(--muted);font-size:14px;}
+    .row{display:flex;gap:10px;}
+    input[type="text"]{
+      flex:1;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);
+      background:var(--panel);color:inherit;font-size:14px;
     }
-    button {
-      background: #238636;
-      color: #fff;
-      cursor: pointer;
-      transition: 0.3s;
+    button.btn{
+      padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:600;
+      background:linear-gradient(180deg,var(--green),#1f8a31);color:white;
+      box-shadow: 0 6px 18px rgba(46,160,67,0.14);
     }
-    button:hover { background: #2ea043; }
-    .result {
-      margin-top: 15px;
-      background: #0d1117;
-      border: 1px solid #30363d;
-      padding: 10px;
-      border-radius: 8px;
-      word-wrap: break-word;
-      font-family: monospace;
+    .small{font-size:13px;color:var(--muted);margin-top:8px;}
+
+    /* Modal */
+    .modal-backdrop{
+      position:fixed;inset:0;background:rgba(2,6,23,0.6);display:flex;align-items:center;justify-content:center;
+      z-index:60;opacity:0;pointer-events:none;transition:all .18s ease;
     }
+    .modal-backdrop.show{opacity:1;pointer-events:auto;}
+    .modal{
+      width:92%;max-width:560px;border-radius:12px;padding:18px;background:linear-gradient(180deg,#0b1220 0%, #0e1724 100%);
+      border:1px solid rgba(255,255,255,0.04);box-shadow: 0 20px 60px rgba(2,6,23,0.7);
+      transform:translateY(8px) scale(.99);transition:all .18s ease;
+    }
+    .modal-backdrop.show .modal{transform:none;}
+    .modal .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+    .modal h2{margin:0;color:var(--accent);font-size:18px;}
+    .close-btn{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:6px 8px;border-radius:8px;}
+    .card-row{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;background:var(--glass);margin-bottom:8px;border:1px solid rgba(255,255,255,0.02);}
+    .left{flex:1;}
+    .label{font-size:13px;color:var(--muted);margin-bottom:3px;}
+    .value{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;font-weight:600;word-break:break-all;}
+    .copy-btn{margin-left:12px;padding:8px 10px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:var(--accent);cursor:pointer;font-weight:700;}
+    .copy-btn.copied{background:linear-gradient(90deg,#103218,#1f8a31);color:white;}
+    .meta{display:flex;gap:10px;font-size:13px;color:var(--muted);margin-top:6px;align-items:center;}
+    .meta .pill{background:rgba(255,255,255,0.02);padding:6px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.02);}
+
+    /* small animation */
+    @keyframes pop {
+      0% { transform: translateY(6px) scale(.98); opacity:0 }
+      100% { transform: none; opacity:1 }
+    }
+    .modal{animation:pop .18s ease both;}
+    .footer{display:flex;justify-content:flex-end;margin-top:12px;}
   </style>
 </head>
 <body>
-  <h1>EXP Generator</h1>
-  <div class="container">
-    <input id="inputText" type="text" placeholder="Enter text..." />
-    <button onclick="generate()">Generate EXP</button>
-    <div id="result" class="result"></div>
+  <div class="card">
+    <h1>EXP Generator</h1>
+    <p class="lead">Enter a name or note, then press Generate — a nice result box will pop up with copy buttons.</p>
+
+    <div class="row">
+      <input id="inputText" type="text" placeholder="Enter text (optional) — e.g. username or tag" />
+      <button class="btn" id="genBtn">Generate</button>
+    </div>
+    <div class="small">Example result includes Email, Password, CODE, Days Left and Expiry Date.</div>
+  </div>
+
+  <!-- Modal -->
+  <div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-hidden="true">
+    <div class="modal" role="document" aria-modal="true">
+      <div class="head">
+        <h2>Generated Access</h2>
+        <button class="close-btn" id="closeModal" title="Close">✕</button>
+      </div>
+
+      <div id="fieldsContainer">
+        <!-- JS will inject field rows here -->
+      </div>
+
+      <div class="meta">
+        <div class="pill" id="daysLeftPill">Days Left: —</div>
+        <div class="pill" id="expiryPill">Expiry: —</div>
+      </div>
+
+      <div class="footer">
+        <button class="btn" id="closeFooter">Close</button>
+      </div>
+    </div>
   </div>
 
   <script>
-    async function generate() {
-      const text = document.getElementById("inputText").value;
-      const res = await fetch(`/api?text=${encodeURIComponent(text)}`);
-      const data = await res.json();
-      document.getElementById("result").innerText = data.exp;
+    const genBtn = document.getElementById('genBtn');
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    const fieldsContainer = document.getElementById('fieldsContainer');
+    const closeModal = document.getElementById('closeModal');
+    const closeFooter = document.getElementById('closeFooter');
+    const daysLeftPill = document.getElementById('daysLeftPill');
+    const expiryPill = document.getElementById('expiryPill');
+
+    function showModal(data){
+      // build rows
+      fieldsContainer.innerHTML = ''; // clear
+      const items = [
+        {label: 'Email', key: 'email'},
+        {label: 'Password', key: 'password'},
+        {label: 'CODE', key: 'code'}
+      ];
+
+      items.forEach(it => {
+        const row = document.createElement('div');
+        row.className = 'card-row';
+        row.innerHTML = `
+          <div class="left">
+            <div class="label"><strong>${it.label} :</strong></div>
+            <div class="value" id="val-${it.key}">${data[it.key] ?? '—'}</div>
+          </div>
+          <div>
+            <button class="copy-btn" data-copy="${it.key}">Copy</button>
+          </div>
+        `;
+        fieldsContainer.appendChild(row);
+      });
+
+      // meta
+      daysLeftPill.textContent = 'Days Left: ' + (data.daysLeft ?? '—');
+      expiryPill.textContent = 'Expiry Date: ' + (data.expiryDate ?? '—');
+
+      // show backdrop
+      modalBackdrop.classList.add('show');
+
+      // attach copy handlers
+      document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.onclick = async (e) => {
+          const k = btn.getAttribute('data-copy');
+          const txt = data[k] || '';
+          try {
+            await navigator.clipboard.writeText(txt);
+            btn.classList.add('copied');
+            btn.textContent = 'Copied';
+            setTimeout(() => {
+              btn.classList.remove('copied');
+              btn.textContent = 'Copy';
+            }, 1400);
+          } catch (err) {
+            // fallback
+            const ta = document.createElement('textarea');
+            ta.value = txt; document.body.appendChild(ta); ta.select();
+            try { document.execCommand('copy'); }
+            catch(e){ console.warn('copy failed'); }
+            ta.remove();
+            btn.classList.add('copied'); btn.textContent = 'Copied';
+            setTimeout(()=>{ btn.classList.remove('copied'); btn.textContent='Copy'; },1400);
+          }
+        };
+      });
     }
+
+    function hideModal(){
+      modalBackdrop.classList.remove('show');
+    }
+
+    closeModal.onclick = hideModal;
+    closeFooter.onclick = hideModal;
+    modalBackdrop.addEventListener('click', (e)=>{
+      if(e.target === modalBackdrop) hideModal();
+    });
+
+    genBtn.addEventListener('click', async ()=>{
+      genBtn.disabled = true;
+      genBtn.textContent = 'Generating…';
+      const text = document.getElementById('inputText').value || '';
+      try {
+        const res = await fetch('/api?text=' + encodeURIComponent(text));
+        if(!res.ok) throw new Error('Network');
+        const data = await res.json();
+        showModal(data);
+      } catch(err){
+        alert('Failed to generate. Try again.');
+        console.error(err);
+      } finally {
+        genBtn.disabled = false;
+        genBtn.textContent = 'Generate';
+      }
+    });
+
+    // Allow enter key to trigger generation
+    document.getElementById('inputText').addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter') genBtn.click();
+    });
   </script>
 </body>
 </html>
