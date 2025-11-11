@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EXP Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0d1117;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1 { color: #58a6ff; margin-bottom: 20px; }
+    .container {
+      background: #161b22;
+      padding: 25px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+    }
+    input {
+      background: #0d1117;
+      color: #fff;
+      border: 1px solid #30363d;
+    }
+    button {
+      background: #238636;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover { background: #2ea043; }
+    .result {
+      margin-top: 15px;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      padding: 10px;
+      border-radius: 8px;
+      word-wrap: break-word;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <h1>EXP Generator</h1>
+  <div class="container">
+    <input id="inputText" type="text" placeholder="Enter text..." />
+    <button onclick="generate()">Generate EXP</button>
+    <div id="result" class="result"></div>
+  </div>
+
+  <script>
+    async function generate() {
+      const text = document.getElementById("inputText").value;
+      const res = await fetch(`/api?text=${encodeURIComponent(text)}`);
+      const data = await res.json();
+      document.getElementById("result").innerText = data.exp;
+    }
+  </script>
+</body>
+</html>
