@@ -1,0 +1,32 @@
+{
+  "2025-11-11": [
+    {
+      "email": "vipuser1@vpnwayz.top",
+      "password": "Pass#1234",
+      "code": "EA5GMNZTYAB59ENKJNPXY7M",
+      "daysLeft": 17,
+      "expiryDate": "29/11/2025"
+    },
+    {
+      "email": "prouser2@vpnwayz.top",
+      "password": "Secure#888",
+      "code": "PLKQWERTY1234ZXCVBNM",
+      "daysLeft": 14,
+      "expiryDate": "26/11/2025"
+    },
+    {
+      "email": "normal3@vpnwayz.top",
+      "password": "Myp@ssword7",
+      "code": "CODE99999ABCDE123456",
+      "daysLeft": 10,
+      "expiryDate": "22/11/2025"
+    },
+    {
+      "email": "vip4@vpnwayz.top",
+      "password": "TopVIP#555",
+      "code": "KEYABCDE1234567890XY",
+      "daysLeft": 20,
+      "expiryDate": "02/12/2025"
+    }
+  ]
+}
